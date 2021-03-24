@@ -41,7 +41,7 @@ class Blockchain():
             'timestamp': time(),
             'transactions': self.current_transactions,
             'proof': proof,
-            'previous_hash': previous_hash or self.hash(self.chain[-1]),
+            'previous_hash': previous_hash or self.hash(self.last_block),
         }
 
         # (TODO): Add mining reward
@@ -53,28 +53,26 @@ class Blockchain():
         self.chain.append(block)
         return block
     
-    def new_transaction(self, sender, sender_private_key, recipient, amount):
+    def new_transaction(self, transaction, signature):
         """
         Adds a transaction to the current list, 
         and returns the index of the block the transaction is in
         """
-        transaction = Transaction(sender, sender_private_key, recipient, amount)
-        
-        verification = self.verify_transaction(sender, transaction.sign_transaction(), transaction.to_dict())
+        verification = self.verify_transaction(transaction, signature)
+
         # returns index of block this transaction is in, or -1 if the transaction verification failed
-        print(verification)
         if verification:
-            self.current_transactions.append(transaction.to_dict())
+            self.current_transactions.append(transaction)
             return len(self.chain) + 1
         else:
             return -1
 
-    def verify_transaction(self, sender, signature, transaction):
+    def verify_transaction(self, transaction, signature):
         """
         Check that the provided signature corresponds to transaction
         signed by the public key
         """
-        public_key = RSA.importKey(binascii.unhexlify(sender))
+        public_key = RSA.importKey(binascii.unhexlify(transaction['sender']))
         verifier = PKCS1_v1_5.new(public_key)
         h = SHA.new(str(transaction).encode('utf8'))
         return verifier.verify(h, binascii.unhexlify(signature))
@@ -94,28 +92,28 @@ class Blockchain():
         # returns the last block in the chain
         return self.chain[-1]
 
-    def proof_of_work(self, last_proof):
+    def proof_of_work(self):
         """
-        Simple Proof of Work Algorithm:
-         - Find a number p' such that hash(pp') contains leading 4 zeroes
-         - p is the previous proof, and p' is the new proof
+        Proof of Work Algorithm:
+         - Find a number p such that hash(last_hash + p) contains leading 4 zeroes
         Returns the new proof
         """
+        last_hash = self.hash(self.last_block)
 
         proof = 0
-        while not self.valid_proof(last_proof, proof):
+        while not self.valid_proof(last_hash, proof):
             proof += 1
 
         return proof
 
     @staticmethod
-    def valid_proof(last_proof, proof):
+    def valid_proof(last_hash, proof):
         """
-        Validates the Proof: Does hash(last_proof, proof) contain 4 leading zeroes?
+        Validates the Proof: Does hash(last_hash, proof) contain 4 leading zeroes?
         Returns a bool that validates the proof
         """
 
-        guess = f'{last_proof}{proof}'.encode()
+        guess = f'{last_hash}{proof}'.encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
         return guess_hash[:4] == "0000"
     
@@ -153,7 +151,7 @@ class Transaction:
 
     def sign_transaction(self):
         """
-        Signs the transaction with the sender's private key
+        Signs the transaction with the sender's private key and returns the signature
         """
         private_key = RSA.importKey(binascii.unhexlify(self.sender_private_key))
         signer = PKCS1_v1_5.new(private_key)
@@ -165,7 +163,7 @@ def new_wallet():
     Creates a new wallet with a public and private key
     """
     random_gen = Crypto.Random.new().read
-    private_key = RSA.generate(2048, random_gen)
+    private_key = RSA.generate(1024, random_gen)
     public_key = private_key.publickey()
     keys = {
         'private_key': binascii.hexlify(private_key.exportKey(format='DER')).decode('ascii'),
@@ -196,15 +194,16 @@ if __name__ == "__main__":
         for _ in range(num_transactions):
             sender, recipient = users_perm[random.randint(1, len(users_perm)-1)]
             amount = random.randint(1, max_amount)
-
-            blockchain.new_transaction(wallets[sender]['public_key'], wallets[sender]['private_key'], wallets[recipient]['public_key'], amount)
+            
+            transaction = Transaction(wallets[sender]['public_key'], wallets[sender]['private_key'], wallets[recipient]['public_key'], amount)
+            blockchain.new_transaction(transaction.to_dict(), transaction.sign_transaction())
         
         # mine new block
-        last_proof = blockchain.last_block['proof']
-        proof = blockchain.proof_of_work(last_proof)
+        last_hash = blockchain.hash(blockchain.last_block)
+        proof = blockchain.proof_of_work()
 
         # verify proof
-        if blockchain.valid_proof(last_proof, proof):
+        if blockchain.valid_proof(last_hash, proof):
             blockchain.new_block(proof)
             print("Block successfully added")
         else:
