@@ -12,6 +12,9 @@ from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5
 from Crypto.Hash import SHA
 
+import flask
+from flask import request, jsonify, render_template
+
 
 class Transaction:
     def __init__(self, sender, sender_private_key, recipient, amount):
@@ -52,3 +55,14 @@ def new_wallet():
         'public_key': binascii.hexlify(public_key.exportKey(format='DER')).decode('ascii')
     }
     return keys
+
+
+
+app = flask.Flask(__name__)
+app.config["DEBUG"] = True
+
+@app.route('/', methods=['GET'])
+def home():
+    return render_template("index.html")
+
+app.run()

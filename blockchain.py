@@ -153,9 +153,6 @@ class Blockchain():
                 return False
 
             # Check that the Proof of Work is correct
-            transaction_elem = ['sender', 'recipient', 'amount']
-            transactions = [OrderedDict((elem, transaction[elem]) for elem in transaction_elem) for transaction in block['transactions']]
-
             if not self.valid_proof(block['previous_hash'], block['proof']):
                 return False
 
