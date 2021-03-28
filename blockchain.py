@@ -11,6 +11,12 @@ import Crypto.Random
 from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5
 from Crypto.Hash import SHA
+from transaction import Transaction, new_wallet
+
+from uuid import uuid4
+from urllib.parse import urlparse
+
+import requests
 
 
 class Blockchain():
@@ -21,8 +27,23 @@ class Blockchain():
         # Create the genesis block
         self.new_block(previous_hash=1, proof=100)
 
-        # (TODO) Add a node list with node ids on the network;
-        # will also probably need methods that add nodes to the network
+        # Node list
+        self.nodes = set()
+        self.node_id = str(uuid4()).replace('-', '')
+
+    def register_node(self, node_url):
+        """
+        Add a new node to the list of nodes
+        """
+        # Check for valid format
+        parsed_url = urlparse(node_url)
+        if parsed_url.netloc:
+            self.nodes.add(parsed_url.netloc)
+        elif parsed_url.path:
+            # Accepts an URL without scheme
+            self.nodes.add(parsed_url.path)
+        else:
+            raise ValueError('Invalid URL')
 
     def print_blockchain(self):
         """
@@ -120,56 +141,57 @@ class Blockchain():
     @staticmethod
     def valid_chain(self, chain):
         """
-        (TODO): Check if a blockchain is valid
+        Check if a blockchain is valid
         """
+        # Traverse chain
+        for i in range(1, len(chain)):
+            # Get next block
+            block = chain[i]
+            
+            # Check hash of the block is correct
+            if block['previous_hash'] != self.hash(chain[i-1]):
+                return False
+
+            # Check that the Proof of Work is correct
+            transaction_elem = ['sender', 'recipient', 'amount']
+            transactions = [OrderedDict((elem, transaction[elem]) for elem in transaction_elem) for transaction in block['transactions']]
+
+            if not self.valid_proof(block['previous_hash'], block['proof']):
+                return False
+
+        return True
     
     def resolve_conflicts(self):
         """
-        (TODO): Resolve conflicts between blockchain nodes
+        Resolve conflicts between blockchain nodes
         by replacing our chain with the longest one in the network.
         """
+        nodes = self.nodes
+        new_chain = None
+
+        current_length = len(self.chain)
+
+        for node in nodes:
+            response = requests.get('http://' + node + '/chain')
+            
+            # Handle response
+            if response.status_code == 200:
+                length = response.json()['length']
+                chain = response.json()['chain']
+
+                # Check if the length is longer and the chain is valid
+                if length > current_length and self.valid_chain(chain):
+                    current_length = length
+                    new_chain = chain
+        
+        if new_chain:
+            self.chain = new_chain
+            return True
+
+        return False
 
 
-# (TODO): Put the Transaction class in a separate client file with Flask
-class Transaction:
-    def __init__(self, sender, sender_private_key, recipient, amount):
-        self.sender = sender
-        self.sender_private_key = sender_private_key
-        self.recipient = recipient
-        self.amount = amount
 
-    def __getattr__(self, attr):
-        return self.data[attr]
-
-    def to_dict(self):
-        """
-        Returns the transaction as an ordered dictionary
-        """
-        return OrderedDict({'sender': self.sender,
-                            'recipient': self.recipient,
-                            'amount': self.amount})
-
-    def sign_transaction(self):
-        """
-        Signs the transaction with the sender's private key and returns the signature
-        """
-        private_key = RSA.importKey(binascii.unhexlify(self.sender_private_key))
-        signer = PKCS1_v1_5.new(private_key)
-        h = SHA.new(str(self.to_dict()).encode('utf8'))
-        return binascii.hexlify(signer.sign(h)).decode('ascii')
-
-def new_wallet():
-    """
-    Creates a new wallet with a public and private key
-    """
-    random_gen = Crypto.Random.new().read
-    private_key = RSA.generate(1024, random_gen)
-    public_key = private_key.publickey()
-    keys = {
-        'private_key': binascii.hexlify(private_key.exportKey(format='DER')).decode('ascii'),
-        'public_key': binascii.hexlify(public_key.exportKey(format='DER')).decode('ascii')
-    }
-    return keys
 
 
 
