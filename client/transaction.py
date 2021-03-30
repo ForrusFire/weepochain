@@ -1,10 +1,4 @@
-import hashlib
-import json
-from time import time
 from collections import OrderedDict
-
-from itertools import permutations
-import random
 
 import binascii
 import Crypto.Random
@@ -65,4 +59,14 @@ app.config["DEBUG"] = True
 def home():
     return render_template("index.html")
 
-app.run()
+
+
+if __name__ == '__main__':
+    from argparse import ArgumentParser
+
+    parser = ArgumentParser()
+    parser.add_argument('-p', '--port', default=8080, type=int, help='port to listen on')
+    args = parser.parse_args()
+    port = args.port
+
+    app.run(host='127.0.0.1', port=port)

@@ -3,20 +3,18 @@ import json
 from time import time
 from collections import OrderedDict
 
-from itertools import permutations
-import random
-
 import binascii
 import Crypto.Random
 from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5
 from Crypto.Hash import SHA
-from transaction import Transaction, new_wallet
 
 from uuid import uuid4
 from urllib.parse import urlparse
 
 import requests
+import flask
+from flask import jsonify, request, render_template
 
 
 class Blockchain():
@@ -44,14 +42,6 @@ class Blockchain():
             self.nodes.add(parsed_url.path)
         else:
             raise ValueError('Invalid URL')
-
-    def print_blockchain(self):
-        """
-        Prints the blockchain
-        """
-        for block in self.chain:
-            print(block)
-            print()
 
     def new_block(self, proof, previous_hash=None):
         """
@@ -138,26 +128,6 @@ class Blockchain():
         guess_hash = hashlib.sha256(guess).hexdigest()
         return guess_hash[:4] == "0000"
     
-    @staticmethod
-    def valid_chain(self, chain):
-        """
-        Check if a blockchain is valid
-        """
-        # Traverse chain
-        for i in range(1, len(chain)):
-            # Get next block
-            block = chain[i]
-            
-            # Check hash of the block is correct
-            if block['previous_hash'] != self.hash(chain[i-1]):
-                return False
-
-            # Check that the Proof of Work is correct
-            if not self.valid_proof(block['previous_hash'], block['proof']):
-                return False
-
-        return True
-    
     def resolve_conflicts(self):
         """
         Resolve conflicts between blockchain nodes
@@ -187,46 +157,176 @@ class Blockchain():
 
         return False
 
-
-
-
-
-
-if __name__ == "__main__":
-    # create blockchain instance
-    blockchain = Blockchain()
-    random.seed(0)
-
-    # establish users and users' wallets
-    users = ["Alice", "Bob", "Carmen", "Dan", "Edgar"]
-    users_perm = list(permutations(users, 2))
-    wallets = {user: new_wallet() for user in users}
-
-    # parameters
-    max_amount = 100
-
-    num_transactions = 5
-    num_blocks = 10
-
-    for _ in range(num_blocks-1):
-        # adds five new transactions from the user list
-        for _ in range(num_transactions):
-            sender, recipient = users_perm[random.randint(1, len(users_perm)-1)]
-            amount = random.randint(1, max_amount)
+    @staticmethod
+    def valid_chain(self, chain):
+        """
+        Check if a blockchain is valid
+        """
+        # Traverse chain
+        for i in range(1, len(chain)):
+            # Get next block
+            block = chain[i]
             
-            transaction = Transaction(wallets[sender]['public_key'], wallets[sender]['private_key'], wallets[recipient]['public_key'], amount)
-            blockchain.new_transaction(transaction.to_dict(), transaction.sign_transaction())
-        
-        # mine new block
-        last_hash = blockchain.hash(blockchain.last_block)
-        proof = blockchain.proof_of_work()
+            # Check hash of the block is correct
+            if block['previous_hash'] != self.hash(chain[i-1]):
+                return False
 
-        # verify proof
-        if blockchain.valid_proof(last_hash, proof):
-            blockchain.new_block(proof)
-            print("Block successfully added")
-        else:
-            print("Proof is not valid")
-        
-    # print status
-    blockchain.print_blockchain()
+            # Check that the Proof of Work is correct
+            if not self.valid_proof(block['previous_hash'], block['proof']):
+                return False
+
+        return True
+
+
+
+app = flask.Flask(__name__)
+app.config["DEBUG"] = True
+
+@app.route('/', methods=['GET'])
+def home():
+    return render_template("index.html")
+
+@app.route('/settings', methods=['GET'])
+def settings():
+    return render_template('settings.html')
+
+
+
+@app.route('/blocks', methods=['GET'])
+def get_blocks():
+    response = {
+        'chain': blockchain.chain,
+        'length': len(blockchain.chain),
+    }
+    return jsonify(response), 200
+
+
+@app.route('/block', methods=['GET'])
+def get_block():
+    query_parameters = request.args
+
+    index = query_parameters.get('index')
+    hash = query_parameters.get('hash')
+
+    if index:
+        for block in blockchain.chain:
+            if block['index'] == index:
+                return jsonify(block), 200
+    elif hash:
+        for block in blockchain.chain:
+            if block['hash'] == hash:
+                return jsonify(block), 200
+    else:
+        return page_not_found(404)
+
+
+@app.route('/block/latest', methods=['GET'])
+def get_latest_block():
+    return jsonify(blockchain.last_block), 200
+
+
+@app.route('/transactions/new', methods=['POST'])
+def new_transaction():
+    values = request.form
+
+    required = ['sender', 'recipient', 'amount', 'signature']
+    if not all(i in values for i in required):
+        return 'Missing values', 400
+    
+    # Create a new transaction
+    transaction = OrderedDict({'sender': values['sender'],
+                            'recipient': values['recipient'],
+                            'amount': values['amount']})
+
+    transaction_result = blockchain.new_transaction(transaction, values['signature'])
+
+    if transaction_result == -1:
+        response = {'message': 'Invalid Transaction!'}
+        return jsonify(response), 406
+    else:
+        response = {'message': 'Transaction will be added to Block ' + str(transaction_result)}
+        return jsonify(response), 201
+
+
+@app.route('/transactions', methods=['GET'])
+def get_transactions():
+    # Get unconfirmed transactions from blockchain
+    transactions = blockchain.current_transactions
+
+    response = {'transactions': transactions}
+    return jsonify(response), 200
+
+
+@app.route('/mine', methods=['GET'])
+def mine():
+    # run the POW algorithm to get the next proof
+    previous_hash = blockchain.hash(blockchain.last_block)
+    proof = blockchain.proof_of_work()
+
+    # (TODO) Add mining reward transaction
+
+    # Add the new block to the chain
+    block = blockchain.new_block(proof, previous_hash)
+
+    response = {
+        'message': "New Block Forged",
+        'index': block['index'],
+        'transactions': block['transactions'],
+        'proof': block['proof'],
+        'previous_hash': block['previous_hash'],
+    }
+    return jsonify(response), 200
+
+
+@app.route('/nodes/register', methods=['POST'])
+def register_nodes():
+    values = request.form
+    nodes = values.get('nodes').replace(" ", "").split(',')
+
+    if nodes is None:
+        return "Error: Please supply a valid list of nodes", 400
+
+    for node in nodes:
+        blockchain.register_node(node)
+
+    response = {
+        'message': 'New nodes have been added',
+        'total_nodes': [node for node in blockchain.nodes],
+    }
+    return jsonify(response), 201
+
+
+@app.route('/nodes/resolve', methods=['GET'])
+def consensus():
+    replaced = blockchain.resolve_conflicts()
+
+    if replaced:
+        response = {
+            'message': 'Our chain was replaced',
+            'new_chain': blockchain.chain
+        }
+    else:
+        response = {
+            'message': 'Our chain is authoritative',
+            'chain': blockchain.chain
+        }
+    return jsonify(response), 200
+
+
+@app.route('/nodes/peers', methods=['GET'])
+def get_nodes():
+    nodes = list(blockchain.nodes)
+    response = {'nodes': nodes}
+    return jsonify(response), 200
+
+
+
+if __name__ == '__main__':
+    from argparse import ArgumentParser
+
+    parser = ArgumentParser()
+    parser.add_argument('-p', '--port', default=5000, type=int, help='port to listen on')
+    args = parser.parse_args()
+    port = args.port
+
+    app.run(host='127.0.0.1', port=port)
