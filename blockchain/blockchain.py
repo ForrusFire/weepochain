@@ -114,7 +114,7 @@ class Blockchain():
     def proof_of_work(self):
         """
         Proof of Work Algorithm:
-         - Find a number p such that hash(last_hash + p) contains leading 4 zeroes
+         - Find a number p such that hash(last_hash + p) contains leading 6 zeroes
         Returns the new proof
         """
         last_hash = self.hash(self.last_block)
@@ -128,13 +128,13 @@ class Blockchain():
     @staticmethod
     def valid_proof(last_hash, proof):
         """
-        Validates the Proof: Does hash(last_hash, proof) contain 4 leading zeroes?
+        Validates the Proof: Does hash(last_hash, proof) contain 6 leading zeroes?
         Returns a bool that validates the proof
         """
 
         guess = f'{last_hash}{proof}'.encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
-        return guess_hash[:4] == "0000"
+        return guess_hash[:6] == "000000"
     
     def resolve_conflicts(self):
         """
@@ -217,15 +217,15 @@ def get_block():
     query_parameters = request.args
 
     index = query_parameters.get('index')
-    hash = query_parameters.get('hash')
+    block_hash = query_parameters.get('hash')
 
     if index:
         for block in blockchain.chain:
             if block['index'] == index:
                 return jsonify(block), 200
-    elif hash:
+    elif block_hash:
         for block in blockchain.chain:
-            if block['hash'] == hash:
+            if block['hash'] == block_hash:
                 return jsonify(block), 200
     else:
         return page_not_found(404)
@@ -278,7 +278,7 @@ def mine():
     mining_transaction = OrderedDict({"sender": MINING_ADDRESS,
                                     "recipient": blockchain.node_id,        
                                     "amount": MINING_REWARD})
-                                    
+
     blockchain.new_transaction(mining_transaction, "")
 
     # Add the new block to the chain
