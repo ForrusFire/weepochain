@@ -17,6 +17,10 @@ import flask
 from flask import jsonify, request, render_template
 
 
+MINING_ADDRESS = "blockchain"
+MINING_REWARD = 1
+
+
 class Blockchain():
     def __init__(self):
         self.chain = []
@@ -55,8 +59,6 @@ class Blockchain():
             'previous_hash': previous_hash or self.hash(self.last_block),
         }
 
-        # (TODO): Add mining reward
-
         # Reset the current list of transactions
         self.current_transactions = []
 
@@ -69,14 +71,20 @@ class Blockchain():
         Adds a transaction to the current list, 
         and returns the index of the block the transaction is in
         """
-        verification = self.verify_transaction(transaction, signature)
-
-        # returns index of block this transaction is in, or -1 if the transaction verification failed
-        if verification:
+        # if the transaction is a mining reward, skip verification
+        if transaction["sender"] == MINING_ADDRESS:
             self.current_transactions.append(transaction)
             return len(self.chain) + 1
+        # if not, verify the transaction
         else:
-            return -1
+            verification = self.verify_transaction(transaction, signature)
+
+            # returns index of block this transaction is in, or -1 if the transaction verification failed
+            if verification:
+                self.current_transactions.append(transaction)
+                return len(self.chain) + 1
+            else:
+                return -1
 
     def verify_transaction(self, transaction, signature):
         """
@@ -266,7 +274,12 @@ def mine():
     previous_hash = blockchain.hash(blockchain.last_block)
     proof = blockchain.proof_of_work()
 
-    # (TODO) Add mining reward transaction
+    # Add mining reward transaction
+    mining_transaction = OrderedDict({"sender": MINING_ADDRESS,
+                                    "recipient": blockchain.node_id,        
+                                    "amount": MINING_REWARD})
+                                    
+    blockchain.new_transaction(mining_transaction, "")
 
     # Add the new block to the chain
     block = blockchain.new_block(proof, previous_hash)
