@@ -139,7 +139,7 @@ class Blockchain():
         current_length = len(self.chain)
 
         for node in nodes:
-            response = requests.get('http://' + node + '/chain')
+            response = requests.get('http://' + node + '/blocks')
             
             # Handle response
             if response.status_code == 200:
@@ -157,7 +157,6 @@ class Blockchain():
 
         return False
 
-    @staticmethod
     def valid_chain(self, chain):
         """
         Check if a blockchain is valid
@@ -181,6 +180,10 @@ class Blockchain():
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
+
+# Create the blockchain
+blockchain = Blockchain()
+
 
 @app.route('/', methods=['GET'])
 def home():
@@ -318,6 +321,11 @@ def get_nodes():
     nodes = list(blockchain.nodes)
     response = {'nodes': nodes}
     return jsonify(response), 200
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return "<h1>404</h1><p>The resource could not be found.</p>", 404
 
 
 
