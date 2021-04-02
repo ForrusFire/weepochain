@@ -15,6 +15,7 @@ from urllib.parse import urlparse
 import requests
 import flask
 from flask import jsonify, request, render_template
+from flask_cors import CORS
 
 
 MINING_ADDRESS = "blockchain"
@@ -188,6 +189,7 @@ class Blockchain():
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
+CORS(app)
 
 # Create the blockchain
 blockchain = Blockchain()

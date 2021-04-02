@@ -59,6 +59,14 @@ app.config["DEBUG"] = True
 def home():
     return render_template("index.html")
 
+@app.route('/transactions/create', methods=['GET'])
+def create_transaction():
+    return render_template("create_transaction.html")
+
+@app.route('/wallet/new', methods=['GET'])
+def create_wallet():
+    return render_template("create_wallet.html")
+
 
 
 if __name__ == '__main__':
