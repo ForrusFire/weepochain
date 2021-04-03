@@ -37,19 +37,6 @@ class Transaction:
         h = SHA.new(str(self.to_dict()).encode('utf8'))
         return binascii.hexlify(signer.sign(h)).decode('ascii')
 
-def new_wallet():
-    """
-    Creates a new wallet with a public and private key
-    """
-    random_gen = Crypto.Random.new().read
-    private_key = RSA.generate(1024, random_gen)
-    public_key = private_key.publickey()
-    keys = {
-        'private_key': binascii.hexlify(private_key.exportKey(format='DER')).decode('ascii'),
-        'public_key': binascii.hexlify(public_key.exportKey(format='DER')).decode('ascii')
-    }
-    return keys
-
 
 
 app = flask.Flask(__name__)
@@ -63,9 +50,37 @@ def home():
 def create_transaction():
     return render_template("create_transaction.html")
 
-@app.route('/wallet/new', methods=['GET'])
+@app.route('/wallet/create', methods=['GET'])
 def create_wallet():
     return render_template("create_wallet.html")
+
+
+@app.route('/wallet/new', methods=['GET'])
+def new_wallet():
+    """
+    Creates a new wallet with a public and private key
+    """
+    random_gen = Crypto.Random.new().read
+    private_key = RSA.generate(1024, random_gen)
+    public_key = private_key.publickey()
+    response = {
+        'private_key': binascii.hexlify(private_key.exportKey(format='DER')).decode('ascii'),
+        'public_key': binascii.hexlify(public_key.exportKey(format='DER')).decode('ascii')
+    }
+    return jsonify(response), 200
+    
+
+@app.route('/transactions/make', methods=['POST'])
+def make_transaction():
+    sender = request.form['sender']
+    sender_private_key = request.form['sender_private_key']
+    recipient = request.form['recipient']
+    amount = request.form['amount']
+
+    transaction = Transaction(sender, sender_private_key, recipient, amount)
+
+    response = {'transaction': transaction.to_dict(), 'signature': transaction.sign_transaction()}
+    return jsonify(response), 200
 
 
 

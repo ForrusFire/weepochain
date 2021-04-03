@@ -21,3 +21,10 @@ The available endpoints are the following:
 |POST|/blockchain/nodes/register|Create new nodes|
 |GET|/blockchain/nodes/resolve|Resolve conflicts between nodes|
 |GET|/blockchain/nodes/peers|Get all peers connected to node|
+
+
+##### Client
+|Method|URL|Description|
+|------|---|-----------|
+|GET|/client/wallet/new|Create a new blockchain wallet|
+|POST|/client/transactions/make|Generate new transaction|
