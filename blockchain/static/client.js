@@ -135,4 +135,41 @@ $(document).ready(function(){
         });
 
     });
+
+
+    // Add nodes
+    $('#add_node_button').click(function(){
+        $.ajax({
+            url: "/nodes/register",
+            type: "POST",
+            dataType : 'json',
+            data: $('#node_form').serialize(),
+            success: function(response){
+                console.log(response);
+                document.getElementById("nodes").value = "";  
+                window.location.reload();
+            },
+            error: function(error){
+                console.log(error);
+            },
+        });
+    });
+
+
+    // Load nodes
+    $.ajax({
+        url: '/nodes/peers',
+        type: 'GET',
+        success: function(response){
+            // Restrict a column to 10 characters, do split words
+            $('#list_nodes').dataTable({
+                data: response['nodes'],
+                columns: [{title: "Nodes"}],
+                columnDefs: [{targets: [1], render: $.fn.dataTable.render.ellipsis(25)}]
+            });
+        },
+        error: function(error){
+            console.log(error);
+        },
+    });
 });
