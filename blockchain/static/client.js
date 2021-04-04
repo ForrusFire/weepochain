@@ -161,12 +161,13 @@ $(document).ready(function(){
         url: '/nodes/peers',
         type: 'GET',
         success: function(response){
-            // Restrict a column to 10 characters, do split words
-            $('#list_nodes').dataTable({
-                data: response['nodes'],
-                columns: [{title: "Nodes"}],
-                columnDefs: [{targets: [1], render: $.fn.dataTable.render.ellipsis(25)}]
-            });
+            console.log(response['nodes']);
+            var node = '';
+            
+            for (i = 0; i < response['nodes'].length; i++){
+                node = "<li> <a href=http://" + response['nodes'][i] + ">" + response['nodes'][i] + "</a></li>";
+                document.getElementById("list_nodes").innerHTML += node;
+            };
         },
         error: function(error){
             console.log(error);
