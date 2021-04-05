@@ -17,7 +17,7 @@ The available endpoints are the following:
 |GET|/blockchain/block/latest|Get the latest block|
 |POST|/blockchain/transactions/new|Add new transaction|
 |GET|/blockchain/transactions|Get unconfirmed transactions|
-|GET|/blockchain/mine|Mine a new block|
+|POST|/blockchain/mine|Mine a new block|
 |POST|/blockchain/nodes/register|Create new nodes|
 |GET|/blockchain/nodes/resolve|Resolve conflicts between nodes|
 |GET|/blockchain/nodes/peers|Get all peers connected to node|

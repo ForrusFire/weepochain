@@ -74,20 +74,25 @@ $(document).ready(function(){
                         // Change the transaction's background color depending on the type of transaction
                         if (response['chain'][i]['transactions'][j]['sender'] == 'blockchain'){
                             // Reward transaction
-                            transaction = $('<div>', {class: "alert alert-warning", text: response['chain'][i]['transactions'][j]['amount'] + " to "});
+                            transaction = $('<div>', {class: "alert alert-warning", text: "   " + response['chain'][i]['transactions'][j]['amount'] + " to "});
+                            arrow = $('<span>', {class: "fa fa-angle-double-right"}); // Add right arrow
+                            transaction.prepend(arrow);
+
                             transaction.append(recipient);
                         } else {
                             // Standard transaction
                             transaction = $('<div>', {class: "alert alert-success"});
                             
-                            var recipient_transaction = $('<div>', {text: response['chain'][i]['transactions'][j]['amount'] + " to "});
+                            var recipient_transaction = $('<span>', {text: "   " + response['chain'][i]['transactions'][j]['amount'] + " to "});
                             recipient_transaction.append(recipient);
-                            transaction.append(recipient_transaction);
+                            arrow = $('<span>', {class: "fa fa-angle-double-right"}); // Add right arrow
+                            transaction.append(arrow, recipient_transaction);
 
-                            var sender_transaction = $('<div>', {text: response['chain'][i]['transactions'][j]['amount'] + " from "});
+                            var sender_transaction = $('<span>', {text: "   " + response['chain'][i]['transactions'][j]['amount'] + " from "});
                             sender_transaction.append(sender);
-                            var br = $('<br>');
-                            transaction.append(br, sender_transaction);
+                            arrow = $('<span>', {class: "fa fa-angle-double-left"}); // Add left arrow
+                            var br = $('<br><br>');
+                            transaction.append(br, arrow, sender_transaction);
                         };
 
                         // Append transaction to card
@@ -100,7 +105,7 @@ $(document).ready(function(){
                     var formattedDateTime = $('<div>', {class: "text-end text-muted", text: date.toLocaleTimeString("en-us", options)});
                     card_text.append(formattedDateTime);
                 } else {
-                    // Append card with index and 'Genesis' title
+                    // Append genesis card with index and 'Genesis' title
                     var block_index = $('<h4>', {text: "Block #" + response['chain'][i]['index']});
                     var hr = $('<hr>');
                     var genesis_tag = $('<h3>', {class: "text-center text-secondary", text: "Genesis"})
@@ -137,7 +142,9 @@ $(document).ready(function(){
         loading(true);
         $.ajax({
             url: "/mine",
-            type: "GET",
+            type: "POST",
+            dataType : 'json',
+            data: $('#mine_form').serialize(),
             success: function(response){
                 window.location.reload();
             },
@@ -183,7 +190,6 @@ $(document).ready(function(){
                 console.log(error);
             }
         });
-
     });
 
 

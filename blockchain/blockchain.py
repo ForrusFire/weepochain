@@ -32,7 +32,7 @@ class Blockchain():
 
         # Node list
         self.nodes = set()
-        self.node_id = str(uuid4()).replace('-', '')
+
 
     def register_node(self, node_url):
         """
@@ -47,6 +47,7 @@ class Blockchain():
             self.nodes.add(parsed_url.path)
         else:
             raise ValueError('Invalid URL')
+
 
     def new_block(self, proof, previous_hash=None):
         """
@@ -66,6 +67,7 @@ class Blockchain():
         # add the new block to the chain
         self.chain.append(block)
         return block
+
     
     def new_transaction(self, transaction, signature):
         """
@@ -87,6 +89,7 @@ class Blockchain():
             else:
                 return -1
 
+
     def verify_transaction(self, transaction, signature):
         """
         Check that the provided signature corresponds to transaction
@@ -97,6 +100,7 @@ class Blockchain():
         h = SHA.new(str(transaction).encode('utf8'))
         return verifier.verify(h, binascii.unhexlify(signature))
     
+
     @staticmethod
     def hash(block):
         """
@@ -107,10 +111,12 @@ class Blockchain():
 
         return hashlib.sha256(block_string).hexdigest()
 
+
     @property
     def last_block(self):
         # returns the last block in the chain
         return self.chain[-1]
+
 
     def proof_of_work(self):
         """
@@ -126,6 +132,7 @@ class Blockchain():
 
         return proof
 
+
     @staticmethod
     def valid_proof(last_hash, proof):
         """
@@ -136,6 +143,7 @@ class Blockchain():
         guess = f'{last_hash}{proof}'.encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
         return guess_hash[:6] == "000000"
+
     
     def resolve_conflicts(self):
         """
@@ -165,6 +173,7 @@ class Blockchain():
             return True
 
         return False
+
 
     def valid_chain(self, chain):
         """
@@ -270,15 +279,21 @@ def get_transactions():
     return jsonify(response), 200
 
 
-@app.route('/mine', methods=['GET'])
+@app.route('/mine', methods=['POST'])
 def mine():
+    values = request.form
+    reward_address = values.get('reward_address')
+
+    if not reward_address:
+        return "Error: Please supply a reward address", 400
+
     # run the POW algorithm to get the next proof
     previous_hash = blockchain.hash(blockchain.last_block)
     proof = blockchain.proof_of_work()
 
     # Add mining reward transaction
     mining_transaction = OrderedDict({"sender": MINING_ADDRESS,
-                                    "recipient": blockchain.node_id,        
+                                    "recipient": reward_address,       
                                     "amount": MINING_REWARD})
 
     blockchain.new_transaction(mining_transaction, "")
@@ -301,7 +316,7 @@ def register_nodes():
     values = request.form
     nodes = values.get('nodes').replace(" ", "").split(',')
 
-    if nodes is None:
+    if not nodes:
         return "Error: Please supply a valid list of nodes", 400
 
     for node in nodes:
