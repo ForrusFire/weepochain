@@ -15,6 +15,7 @@ The available endpoints are the following:
 |GET|/blockchain/block?index={index}|Get block by index|
 |GET|/blockchain/block?hash={hash}|Get block by hash|
 |GET|/blockchain/block/latest|Get the latest block|
+|GET|/blockchain/block/latest/hash|Get the latest block's hash|
 |POST|/blockchain/transactions/new|Add new transaction|
 |GET|/blockchain/transactions|Get unconfirmed transactions|
 |POST|/blockchain/mine|Mine a new block|

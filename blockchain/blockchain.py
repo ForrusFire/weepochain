@@ -232,11 +232,11 @@ def get_block():
 
     if index:
         for block in blockchain.chain:
-            if block['index'] == index:
+            if block['index'] == int(index):
                 return jsonify(block), 200
     elif block_hash:
         for block in blockchain.chain:
-            if block['hash'] == block_hash:
+            if blockchain.hash(block) == block_hash:
                 return jsonify(block), 200
     else:
         return page_not_found(404)
@@ -245,6 +245,11 @@ def get_block():
 @app.route('/block/latest', methods=['GET'])
 def get_latest_block():
     return jsonify(blockchain.last_block), 200
+
+
+@app.route('/block/latest/hash', methods=['GET'])
+def get_latest_block_hash():
+    return jsonify(blockchain.hash(blockchain.last_block)), 200
 
 
 @app.route('/transactions/new', methods=['POST'])
@@ -316,7 +321,7 @@ def register_nodes():
     values = request.form
     nodes = values.get('nodes').replace(" ", "").split(',')
 
-    if not nodes:
+    if nodes == ['']:
         return "Error: Please supply a valid list of nodes", 400
 
     for node in nodes:
