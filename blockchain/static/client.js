@@ -2,7 +2,7 @@ $(document).ready(function(){
 
     // Load unmined transactions
     $.ajax({
-        url: "/transactions",
+        url: "/blockchain/transactions",
         type: 'GET',
         success: function(response){
             // Generate unmined transactions table
@@ -37,7 +37,7 @@ $(document).ready(function(){
 
     // Load blocks on the chain
     $.ajax({
-        url: "/blocks",
+        url: "/blockchain/blocks",
         type: "GET",
         success: function(response){
             var count = 0;
@@ -152,7 +152,7 @@ $(document).ready(function(){
     function get_latest_block_hash() {
         var latest_block_hash;
         $.ajax({
-            url: "/block/latest/hash",
+            url: "/blockchain/block/latest/hash",
             type: "GET",
             async: false,
             success: function(response){
@@ -170,7 +170,7 @@ $(document).ready(function(){
     $("#mine_button").click(function(){
         loading(true);
         $.ajax({
-            url: "/mine",
+            url: "/miner/mine",
             type: "POST",
             dataType : 'json',
             data: $('#mine_form').serialize(),

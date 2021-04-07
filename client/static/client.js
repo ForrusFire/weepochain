@@ -39,7 +39,7 @@ $(document).ready(function(){
     // Create new transaction
     $('#generate_transaction').click(function(){
         $.ajax({
-            url: '/transactions/make',
+            url: '/client/transactions/make',
             type: 'POST',
             dataType : 'json',
             data: $('#transaction_form').serialize(),
@@ -62,7 +62,7 @@ $(document).ready(function(){
     // Confirm transaction
     $('#button_confirm_transaction').click(function(){
         $.ajax({
-            url: $('#node_url').val() + '/transactions/new',
+            url: $('#node_url').val() + '/blockchain/transactions/new',
             type: 'POST',
             headers: {'Access-Control-Allow-Origin':'*'},
             dataType: 'json',

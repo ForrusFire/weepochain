@@ -70,7 +70,7 @@ def new_wallet():
     return jsonify(response), 200
     
 
-@app.route('/transactions/make', methods=['POST'])
+@app.route('/client/transactions/make', methods=['POST'])
 def make_transaction():
     sender = request.form['sender']
     sender_private_key = request.form['sender_private_key']

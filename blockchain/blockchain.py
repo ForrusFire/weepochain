@@ -214,7 +214,7 @@ def settings():
 
 
 
-@app.route('/blocks', methods=['GET'])
+@app.route('/blockchain/blocks', methods=['GET'])
 def get_blocks():
     response = {
         'chain': blockchain.chain,
@@ -223,7 +223,7 @@ def get_blocks():
     return jsonify(response), 200
 
 
-@app.route('/block', methods=['GET'])
+@app.route('/blockchain/block', methods=['GET'])
 def get_block():
     query_parameters = request.args
 
@@ -242,17 +242,17 @@ def get_block():
         return page_not_found(404)
 
 
-@app.route('/block/latest', methods=['GET'])
+@app.route('/blockchain/block/latest', methods=['GET'])
 def get_latest_block():
     return jsonify(blockchain.last_block), 200
 
 
-@app.route('/block/latest/hash', methods=['GET'])
+@app.route('/blockchain/block/latest/hash', methods=['GET'])
 def get_latest_block_hash():
     return jsonify(blockchain.hash(blockchain.last_block)), 200
 
 
-@app.route('/transactions/new', methods=['POST'])
+@app.route('/blockchain/transactions/new', methods=['POST'])
 def new_transaction():
     values = request.form
 
@@ -275,7 +275,7 @@ def new_transaction():
         return jsonify(response), 201
 
 
-@app.route('/transactions', methods=['GET'])
+@app.route('/blockchain/transactions', methods=['GET'])
 def get_transactions():
     # Get unconfirmed transactions from blockchain
     transactions = blockchain.current_transactions
@@ -284,7 +284,7 @@ def get_transactions():
     return jsonify(response), 200
 
 
-@app.route('/mine', methods=['POST'])
+@app.route('/miner/mine', methods=['POST'])
 def mine():
     values = request.form
     reward_address = values.get('reward_address')
