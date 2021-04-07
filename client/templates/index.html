@@ -5,24 +5,23 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-		<title>Blockchain / API Testing</title>
+		<title>Weepo Client</title>
 		<meta name="author" content="Sam Chun">
 		<meta name="keywords" content="">
-		<meta name="description" content="This is PogU Niversity Coin's testing page">
+		<meta name="description" content="This is Weepo's client page">
 		<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 		<link rel="canonical" href="">
 		<link rel="icon" href="">
 
 		<meta property="og:site_name" content="">
-		<meta property="og:title" content="Blockchain / API Testing">
+		<meta property="og:title" content="Weepo Client">
 		<meta property="og:url" content="">
 		<meta property="og:type" content="">
-		<meta property="og:description" content="This is PogU Niversity Coin's testing page">
+		<meta property="og:description" content="This is Weepo's client page">
 
 		<!--CSS Stylesheets-->
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" 
 			integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
 		<link rel="stylesheet" href="/static/styles.css">
 	</head>
 
@@ -31,7 +30,7 @@
 		<!--Navbar-->
 		<nav class="navbar navbar-expand-md navbar-light" style='background-color: #e3f2fd;'>
 			<div class="container">
-				<a class="navbar-brand h1 mb-0" href="/">PogU Niversity Coin Client</a>
+				<a class="navbar-brand h1 mb-0" href="/">Weepo Client</a>
 				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
 					<span class="navbar-toggler-icon"></span>
 				</button>
@@ -56,42 +55,80 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card-body">
-                        <h4 class="card-title">Transactions</h4>
-                        <p class="card-text">Enter a blockchain node URL and click on "View Transactions" to check all transactions</p>
+                        <h4 class="card-title">Weepo Home</h4>
+                        <p class="card-text">Hello! This is an experimental blockchain platform built by Sam Chun. This blockchain is secured with a Proof of Work mechanism
+							(an alternate Proof of Stake consensus system is in progress), and it closely models the structure and architecture of Satoshi Nakomoto's original paper. 
+							The blocks currently store transaction data between addresses and they are linked together with SHA-1 hashes.
+						</p>
+						<p class="card-text">The REST API was built from Flask in Python and handles all requests to the blockchain, wallets, transactions, nodes, and mining. All endpoints
+							are listed on the project's Github page.
+						</p>
+						<p class="card-text"><strong>In order to send and receive Weepo coins,</strong> you first need to create your RSA-secured blockchain wallet. The wallet's public key is 
+							your address, and the private key creates the signature that verifies transactions. Do not share your private key with anyone.
+						</p>
+						<p class="card-text"><strong>In order to mine blocks and receive rewards,</strong> you'll need to connect to the Weepo Blockchain port (default is 127.0.0.1:5000). 
+							Then head to 'Settings' and add the URL of at least one node that is already on the network; this will act as your "invite" to the main chain.
+						</p>
                     </div>
                 </div>
             </div>
         </div>
 
+		<br><br>
+
+		<!--Wallet Balance Checker-->
         <div class="container alert alert-secondary">
-            <div class="row">
-                <label class="col-sm-2">Node URL:</label>
-                <div class="col-sm-10">
-                    <textarea id="node_url" rows="1" class="form-control" placeholder="Enter URL Here">http://127.0.0.1:5000</textarea>
-                </div>
-            </div>
-
-            <br>
-
-            <div class="row">
-                <div class="col-lg-12 text-center">
-                    <input type="button" id="view_transactions" class="btn btn-primary btn-lg" value="View Transactions">
-                </div>
-            </div>
+			<form id='wallet_balance_form'>
+				<div class="row">
+					<h5>Check Wallet Balance</h5>
+				</div>
+	
+				<br>
+	
+				<div class="row">
+					<label class="col-sm-2">Wallet Address:</label>
+					<div class="col-sm-10">
+						<input type="text" name="wallet_address" id="wallet_address" rows="1" class="form-control" placeholder="Enter wallet address here"></input>
+					</div>
+				</div>
+	
+				<br>
+	
+				<div class="row">
+					<label class="col-sm-2">Node URL:</label>
+					<div class="col-sm-10">
+						<textarea id="node_url" rows="1" class="form-control" placeholder="Enter URL Here">http://127.0.0.1:5000</textarea>
+					</div>
+				</div>
+	
+				<br>
+	
+				<div class="row">
+					<div class="col-lg-12 text-center">
+						<input type="button" id="view_balance" class="btn btn-primary btn-lg" value="View Balance">
+					</div>
+				</div>
+			</form>
         </div>
-        
-        <br>
 
-		<!-- Blockchain Transactions Table -->
+		<br>
+
+		<!--Show Wallet Balance-->
 		<div class="container">
-			<table id="transactions" class="table table-striped table-bordered"></table>
+			<div class="row scc-hidden" id="wallet_balance_card">
+                <div class="col-sm-4 offset-4 text-center">
+                    <div class="alert alert-info" role="alert">
+                        Wallet Balance:
+						<span id="wallet_balance"></span>
+						Weepo Coins
+                    </div>
+                </div>
+            </div>
 		</div>
 
 
 		<!--Scripts-->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-		<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
-		<script src='//cdn.datatables.net/plug-ins/1.10.24/dataRender/ellipsis.js'></script>
 		<script src='/static/client.js'></script>
 	</body>
 </html>

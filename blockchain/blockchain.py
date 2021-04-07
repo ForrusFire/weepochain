@@ -19,7 +19,7 @@ from flask_cors import CORS
 
 
 MINING_ADDRESS = "blockchain"
-MINING_REWARD = 1
+MINING_REWARD = 100
 
 
 class Blockchain():
@@ -356,6 +356,31 @@ def get_nodes():
     nodes = list(blockchain.nodes)
     response = {'nodes': nodes}
     return jsonify(response), 200
+
+
+@app.route('/wallet/balance', methods=['POST'])
+def get_balance():
+    values = request.form
+    wallet_address = values.get('wallet_address')
+
+    balance = 0
+
+    # Iterate through block's transactions
+    for block in blockchain.chain:
+        for transaction in block['transactions']:
+            if transaction['sender'] == wallet_address:
+                balance -= transaction['amount']
+            if transaction['recipient'] == wallet_address:
+                balance += transaction['amount']
+    
+    # Iterate through pending transactions
+    for transaction in blockchain.current_transactions:
+        if transaction['sender'] == wallet_address:
+            balance -= transaction['amount']
+        if transaction['recipient'] == wallet_address:
+            balance += transaction['amount']
+
+    return jsonify(balance), 200
 
 
 @app.errorhandler(404)

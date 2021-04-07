@@ -1,6 +1,6 @@
-# PogU-Niversity-Coin
+# Weepo Blockchain
 
-This is a test blockchain, with a custom API and UI.
+This is an experimental blockchain, with a custom API and UI.
 
 #### HTTP Server
 The API handles requests to the blockchain, wallets, addresses, transactions, nodes, and mining.
@@ -22,6 +22,7 @@ The available endpoints are the following:
 |POST|/blockchain/nodes/register|Create new nodes|
 |GET|/blockchain/nodes/resolve|Resolve conflicts between nodes|
 |GET|/blockchain/nodes/peers|Get all peers connected to node|
+|POST|/blockchain/wallet/balance|Get blockchain wallet balance|
 
 
 ##### Client
