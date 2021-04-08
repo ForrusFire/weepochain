@@ -10,6 +10,10 @@ import flask
 from flask import request, jsonify, render_template
 
 
+# TODO: Consolidate globals
+TRANSACTION_FEE = 1
+
+
 class Transaction:
     def __init__(self, sender, sender_private_key, recipient, amount):
         self.sender = sender
@@ -77,9 +81,29 @@ def make_transaction():
     recipient = request.form['recipient']
     amount = request.form['amount']
 
-    transaction = Transaction(sender, sender_private_key, recipient, amount)
+    if not recipient:
+        return "Error: Please input a recipient", 400
 
-    response = {'transaction': transaction.to_dict(), 'signature': transaction.sign_transaction()}
+    # Check if the amount is an integer
+    try:
+        amount = int(amount)
+    except ValueError:
+        return "Error: Please input a valid amount", 400
+
+    # Check if the amount is greater than or equal to the transaction fee
+    if amount < TRANSACTION_FEE:
+        return "Error: Please input a valid amount", 400
+
+    # Create the transaction
+    transaction = Transaction(sender, sender_private_key, recipient, amount - TRANSACTION_FEE)
+
+    # Check if the private key is valid
+    # TODO: Check if private key and public key match
+    try:
+        response = {'transaction': transaction.to_dict(), 'amount': amount, 'signature': transaction.sign_transaction()}
+    except (ValueError, TypeError):
+        return "Error: Invalid private key", 406
+
     return jsonify(response), 200
 
 

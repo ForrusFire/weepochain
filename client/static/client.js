@@ -47,7 +47,7 @@ $(document).ready(function(){
                 // Fill in modal values
                 $('#confirmation_sender').val(response['transaction']['sender']);
                 $('#confirmation_recipient').val(response['transaction']['recipient']);
-                $('#confirmation_amount').val(response['transaction']['amount']);
+                $('#confirmation_amount').val(response['amount']);
                 $('#transaction_signature').val(response['signature']);
 
                 $('#transactionModal').modal('show');

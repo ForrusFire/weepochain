@@ -89,6 +89,13 @@ $(document).ready(function(){
                             arrow = $('<span>', {class: "fa fa-angle-double-right"}); // Add right arrow
                             transaction.prepend(arrow);
                             transaction.append(recipient_str_trim);
+                        } else if (response['chain'][i]['transactions'][j]['recipient'] == 'blockchain'){
+                            // Transaction fee
+                            transaction = $('<div>', {class: "alert alert-danger", text: "   " + response['chain'][i]['transactions'][j]['amount'] + " from "});
+
+                            arrow = $('<span>', {class: "fa fa-angle-double-left"}); // Add left arrow
+                            transaction.prepend(arrow);
+                            transaction.append(sender_str_trim);
                         } else {
                             // Standard transaction
                             transaction = $('<div>', {class: "alert alert-success"});

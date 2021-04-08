@@ -1,4 +1,4 @@
-# Weepo Blockchain
+# Weepo Chain
 
 This is an experimental blockchain, with a custom API and UI. This blockchain is secured with a Proof of Work consensus mechanism, and the blocks store transaction data between addresses.
 

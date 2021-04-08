@@ -20,6 +20,7 @@ from flask_cors import CORS
 
 MINING_ADDRESS = "blockchain"
 MINING_REWARD = 100
+TRANSACTION_FEE = 1
 
 
 class Blockchain():
@@ -74,8 +75,8 @@ class Blockchain():
         Adds a transaction to the current list, 
         and returns the index of the block the transaction is in
         """
-        # if the transaction is a mining reward, skip verification
-        if transaction["sender"] == MINING_ADDRESS:
+        # if the transaction is a mining reward or transaction fee, skip verification
+        if transaction["sender"] == MINING_ADDRESS or transaction['recipient'] == MINING_ADDRESS:
             self.current_transactions.append(transaction)
             return len(self.chain) + 1
         # if not, verify the transaction
@@ -259,11 +260,31 @@ def new_transaction():
     required = ['sender', 'recipient', 'amount', 'signature']
     if not all(i in values for i in required):
         return 'Missing values', 400
+
+    # Calculate sender's balance
+    balance = 0
+
+    for block in blockchain.chain:
+        for transaction in block['transactions']:
+            if transaction['sender'] == values['sender']:
+                balance -= transaction['amount']
+            if transaction['recipient'] == values['sender']:
+                balance += transaction['amount']
+    
+    for transaction in blockchain.current_transactions:
+        if transaction['sender'] == values['sender']:
+            balance -= transaction['amount']
+        if transaction['recipient'] == values['sender']:
+            balance += transaction['amount']
+
+    # Check if the sender has enough funds
+    if balance < int(values['amount']):
+        return "Error: Insufficient funds", 406
     
     # Create a new transaction
     transaction = OrderedDict({'sender': values['sender'],
                             'recipient': values['recipient'],
-                            'amount': values['amount']})
+                            'amount': int(values['amount']) - TRANSACTION_FEE})
 
     transaction_result = blockchain.new_transaction(transaction, values['signature'])
 
@@ -271,6 +292,12 @@ def new_transaction():
         response = {'message': 'Invalid Transaction!'}
         return jsonify(response), 406
     else:
+        # Add transaction fee
+        transaction_fee = OrderedDict({'sender': values['sender'],
+                                    'recipient': MINING_ADDRESS,
+                                    'amount': TRANSACTION_FEE})
+        blockchain.new_transaction(transaction_fee, "")
+
         response = {'message': 'Transaction will be added to Block ' + str(transaction_result)}
         return jsonify(response), 201
 
