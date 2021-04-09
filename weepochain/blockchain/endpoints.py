@@ -2,8 +2,8 @@ from flask import Blueprint, jsonify, request, render_template
 
 from collections import OrderedDict
 
-from constants import MINING_ADDRESS, TRANSACTION_FEE, MINING_REWARD
-from run import blockchain
+from ..constants import MINING_ADDRESS, TRANSACTION_FEE, MINING_REWARD
+from .__init__ import blockchain
 
 
 bp = Blueprint('bp', __name__)

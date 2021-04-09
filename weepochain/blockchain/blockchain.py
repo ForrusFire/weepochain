@@ -14,7 +14,7 @@ from urllib.parse import urlparse
 
 import requests
 
-from constants import MINING_ADDRESS, MINING_REWARD, TRANSACTION_FEE
+from ..constants import MINING_ADDRESS, MINING_REWARD, TRANSACTION_FEE
 
 
 class Blockchain():

@@ -4,7 +4,8 @@ import binascii
 import Crypto.Random
 from Crypto.PublicKey import RSA
 
-from transaction import Transaction, TRANSACTION_FEE
+from .transaction import Transaction
+from ..constants import TRANSACTION_FEE
 
 
 bp = Blueprint('bp', __name__)

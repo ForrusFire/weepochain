@@ -7,9 +7,6 @@ from Crypto.Signature import PKCS1_v1_5
 from Crypto.Hash import SHA
 
 
-# TODO: Consolidate globals
-TRANSACTION_FEE = 1
-
 
 class Transaction:
     def __init__(self, sender, sender_private_key, recipient, amount):
