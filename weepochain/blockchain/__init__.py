@@ -13,7 +13,7 @@ def create_app():
     app.config["DEBUG"] = True
     CORS(app)
 
-    from .endpoints import bp
+    from .views import bp
     app.register_blueprint(bp)
 
     return app
