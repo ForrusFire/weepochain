@@ -2,8 +2,9 @@ from flask import Blueprint, jsonify, request, render_template
 
 from collections import OrderedDict
 
-from ..constants import MINING_ADDRESS, TRANSACTION_FEE, MINING_REWARD
 from .__init__ import blockchain
+from .database import save_block
+from ..constants import MINING_ADDRESS, TRANSACTION_FEE, MINING_REWARD
 
 
 bp = Blueprint('bp', __name__)
@@ -135,6 +136,9 @@ def mine():
 
     # Add the new block to the chain
     block = blockchain.new_block(proof, previous_hash)
+
+    # Save the new block in the database
+    save_block(block)
 
     response = {
         'message': "New Block Forged",
