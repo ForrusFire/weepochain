@@ -188,3 +188,19 @@ class Blockchain():
                 return False
 
         return True
+
+
+    def db_pop_genesis(self):
+        """
+        Pops the genesis block if it's the only block on the chain,
+        and returns the popped genesis block
+        """
+        if len(self.chain) == 1:
+            return self.chain.pop()
+
+
+    def db_add_block(self, block):
+        """
+        Adds a block from the database to the chain; returns no value
+        """
+        self.chain.append(block)
