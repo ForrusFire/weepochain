@@ -27,8 +27,18 @@ def save_block(block):
 
 def save_blocks(chain):
     """
-    (TODO) Saves an entire chain into the database
+    Saves an entire chain into the database
     """
+    conn = sqlite3.connect(DB_PATH)
+
+    clear_blocks()
+
+    for block in chain:
+        save_block(block)
+
+    # Save changes
+    conn.commit()
+    conn.close()
 
 
 def load_blocks(blockchain):

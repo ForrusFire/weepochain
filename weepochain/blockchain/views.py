@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request, render_template
 from collections import OrderedDict
 
 from .__init__ import blockchain
-from .database import save_block
+from .database import save_block, save_blocks
 from ..constants import MINING_ADDRESS, TRANSACTION_FEE, MINING_REWARD
 
 
@@ -39,12 +39,13 @@ def get_block():
         for block in blockchain.chain:
             if block['index'] == int(index):
                 return jsonify(block), 200
-    elif block_hash:
+
+    if block_hash:
         for block in blockchain.chain:
             if blockchain.hash(block) == block_hash:
                 return jsonify(block), 200
-    else:
-        return page_not_found(404)
+    
+    return page_not_found(404)
 
 
 @bp.route('/blockchain/block/latest', methods=['GET'])
@@ -173,6 +174,9 @@ def consensus():
     replaced = blockchain.resolve_conflicts()
 
     if replaced:
+        # Save the new chain into the database
+        save_blocks(blockchain.chain)
+        
         response = {
             'message': 'Our chain was replaced',
             'new_chain': blockchain.chain
