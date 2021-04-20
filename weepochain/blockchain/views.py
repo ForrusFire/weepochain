@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, render_template
 
 from collections import OrderedDict
 
-from .__init__ import blockchain
+from .__init__ import blockchain, node_network
 from .database import save_block, save_blocks
 from ..constants import MINING_ADDRESS, TRANSACTION_FEE, MINING_REWARD
 
@@ -160,23 +160,23 @@ def register_nodes():
         return "Error: Please supply a valid list of nodes", 400
 
     for node in nodes:
-        blockchain.register_node(node)
+        node_network.register_node(node)
 
     response = {
         'message': 'New nodes have been added',
-        'total_nodes': [node for node in blockchain.nodes],
+        'total_nodes': [node for node in node_network.nodes],
     }
     return jsonify(response), 201
 
 
 @bp.route('/nodes/resolve', methods=['GET'])
 def consensus():
-    replaced = blockchain.resolve_conflicts()
+    replaced = blockchain.resolve_conflicts(node_network)
 
     if replaced:
         # Save the new chain into the database
         save_blocks(blockchain.chain)
-        
+
         response = {
             'message': 'Our chain was replaced',
             'new_chain': blockchain.chain
@@ -191,7 +191,7 @@ def consensus():
 
 @bp.route('/nodes/peers', methods=['GET'])
 def get_nodes():
-    nodes = list(blockchain.nodes)
+    nodes = list(node_network.nodes)
     response = {'nodes': nodes}
     return jsonify(response), 200
 

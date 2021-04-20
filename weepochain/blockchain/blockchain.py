@@ -10,7 +10,6 @@ from Crypto.Signature import PKCS1_v1_5
 from Crypto.Hash import SHA
 
 from uuid import uuid4
-from urllib.parse import urlparse
 
 import requests
 
@@ -24,24 +23,6 @@ class Blockchain():
 
         # Create the genesis block
         self.new_block(previous_hash=1, proof=100)
-
-        # Node list
-        self.nodes = set()
-
-
-    def register_node(self, node_url):
-        """
-        Add a new node to the list of nodes
-        """
-        # Check for valid format
-        parsed_url = urlparse(node_url)
-        if parsed_url.netloc:
-            self.nodes.add(parsed_url.netloc)
-        elif parsed_url.path:
-            # Accepts an URL without scheme
-            self.nodes.add(parsed_url.path)
-        else:
-            raise ValueError('Invalid URL')
 
 
     def new_block(self, proof, previous_hash=None):
@@ -140,12 +121,12 @@ class Blockchain():
         return guess_hash[:6] == "000000"
 
     
-    def resolve_conflicts(self):
+    def resolve_conflicts(self, node_network):
         """
         Resolve conflicts between blockchain nodes
         by replacing our chain with the longest one in the network.
         """
-        nodes = self.nodes
+        nodes = node_network.nodes
         new_chain = None
 
         current_length = len(self.chain)
