@@ -17,7 +17,6 @@
 		<link rel="stylesheet" href="/static/styles.css">
 	</head>
 
-
 	<body>
 		<!--Navbar-->
 		<nav class="navbar navbar-expand-md navbar-light" style='background-color: #e3f2fd;'>
@@ -67,36 +66,28 @@
             </div>
         </div>
 
-		<br><br>
-
 		<!--Wallet Balance Checker-->
-        <div class="container alert alert-secondary">
+        <div class="container alert alert-secondary scc-large-breaktop">
 			<form id='wallet_balance_form'>
 				<div class="row">
 					<h5>Check Wallet Balance</h5>
 				</div>
 	
-				<br>
-	
-				<div class="row">
+				<div class="row scc-breaktop">
 					<label class="col-sm-2">Wallet Address:</label>
 					<div class="col-sm-10">
 						<input type="text" name="wallet_address" id="wallet_address" rows="1" class="form-control" placeholder="Enter wallet address here"></input>
 					</div>
 				</div>
 	
-				<br>
-	
-				<div class="row">
+				<div class="row scc-breaktop">
 					<label class="col-sm-2">Node URL:</label>
 					<div class="col-sm-10">
 						<textarea id="node_url" rows="1" class="form-control" placeholder="Enter URL Here">http://127.0.0.1:5000</textarea>
 					</div>
 				</div>
 	
-				<br>
-	
-				<div class="row">
+				<div class="row scc-breaktop">
 					<div class="col-lg-12 text-center">
 						<input type="button" id="view_balance" class="btn btn-primary btn-lg" value="View Balance">
 					</div>
@@ -104,10 +95,8 @@
 			</form>
         </div>
 
-		<br>
-
 		<!--Show Wallet Balance-->
-		<div class="container">
+		<div class="container scc-breaktop">
 			<div class="row scc-hidden" id="wallet_balance_card">
                 <div class="justify-content-center d-inline-flex">
                     <div class="alert alert-info" role="alert">
@@ -118,7 +107,6 @@
                 </div>
             </div>
 		</div>
-
 
 		<!--Scripts-->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

@@ -17,7 +17,6 @@
 		<link rel="stylesheet" href="/static/styles.css">
 	</head>
 
-
 	<body>
 		<!--Navbar-->
 		<nav class="navbar navbar-expand-md navbar-light" style='background-color: #e3f2fd;'>
@@ -42,7 +41,6 @@
 			</div>
 		</nav>
 
-
 		<!--Transaction Creator-->
         <div class="container">
             <div class="row">
@@ -54,10 +52,8 @@
                 </div>
             </div>
         </div>
-      
-        <br>
     
-        <div class="container alert alert-secondary">
+        <div class="container alert alert-secondary scc-breaktop">
             <form id="transaction_form">
                 <div class="row">
                     <label class="col-sm-2">Sender Address:</label>
@@ -65,46 +61,35 @@
                         <input type="text" name="sender" id="sender" rows="2" class="form-control">
                     </div>
                 </div>
-      
-                <br>
               
-                <div class="row">
+                <div class="row scc-breaktop">
                     <label class="col-sm-2">Sender Private Key:</label>
                     <div class="col-sm-10">
                         <input type="text" name="sender_private_key" id="sender_private_key" rows="2" class="form-control">
                     </div>
                 </div>
-      
-                <br>
               
-                <div class="row">
+                <div class="row scc-breaktop">
                     <label class="col-sm-2">Recipient Address:</label>
                     <div class="col-sm-10">
                         <input type="text" name="recipient" id="recipient" rows="2" class="form-control">
                     </div>
                 </div>
-      
-                <br>
               
-                <div class="row">
+                <div class="row scc-breaktop">
                     <label class="col-sm-2">Amount to Send:</label>
                     <div class="col-sm-10">
                         <input type="text" name="amount" id="amount" rows="2" class="form-control">
                     </div>
                 </div>
-      
-                <br>
               
-                <div class="row">
+                <div class="row scc-breaktop">
                     <div class="col-lg-12 text-center">
                         <input type="button" id="generate_transaction" class="btn btn-primary btn-lg" value="Generate Transaction">
                     </div>
                 </div>
-      
-                <br>
             </form>
         </div>
-      
       
         <!--Transction Modal-->
         <div class="modal modal-alert fade" id="transactionModal" tabindex="-1" role="dialog" aria-labelledby="transactionModal" aria-hidden="true">
@@ -162,7 +147,6 @@
             </div>
         </div>
       
-      
         <!-- Alert Message for successful transaction -->
         <div class="modal modal-alert fade" id="success_transaction_modal" tabindex="-1" role="dialog" aria-labelledby="successModal" aria-hidden="true">
             <div class="modal-dialog">
@@ -184,7 +168,6 @@
                 </div>
             </div>
         </div>
-      
       
 		<!--Scripts-->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
