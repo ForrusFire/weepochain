@@ -3,6 +3,7 @@
 This is an experimental blockchain built from scratch, with a custom API and UI. The features of the blockchain are as follows:
 
 * Proof of Work consensus mechanism, motivated by Satoshi Nakomoto's original paper
+* RSA cryptocurrency wallets and encrypted transactions
 * Simple UTXO based transaction model with client-side account balances
 * HTTP interface to control nodes on the network
 * Simple conflict resolution between nodes
@@ -28,7 +29,7 @@ The default node port is http://localhost:5000/. Add another node to the blockch
    python (insert path to run_blockchain.py here) -p 5001
    ```
 
-Access the blockchain node dashboard in order to mine blocks and receive mining rewards.
+Access the blockchain node dashboard in order to visualize the blockchain, mine blocks, and receive mining rewards.
 
 ##### Client
 To create wallets and send Weepo Coins, execute run_client.py
@@ -36,21 +37,21 @@ To create wallets and send Weepo Coins, execute run_client.py
    python (insert path to run_blockchain.py here)
    ```
 
-Then, access the client through http://localhost:8080/
+Then, access the client dashboard through http://localhost:8080/
 
 
 ### Node Network
 The network uses websockets to communicate with other nodes (P2P). The communication protocols ensure that the longest valid chain is dominant on the network, and
 node conflicts are resolved through chain length.
 
-New nodes must connect to at least one node already on the network. This acts as an 'invite' to the main chain.
+New nodes must connect to at least one node already on the network; this acts as an 'invite' to the main chain.
 
 Node data and chain resolutions are persisted to a folder.
 
 
 ### Wallets and Transactions
 Wallets are generated with public and private key encryption based on the RSA algorithm. Transactions are also generated through RSA encryption and signatures are verified
-on the nodes.
+by the nodes.
 
 
 ### HTTP Server
