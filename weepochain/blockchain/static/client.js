@@ -46,60 +46,60 @@ $(document).ready(function(){
             // Add four blocks to each row, starting from the latest block
             for (i = response['length']-1; i >= 0; i--) {
                 // Creates card text HTML element
-                var card_text = $('<div>', {class: "card-text"});
+                const card_text = $('<div>', {class: "card-text"});
                 
                 // Determine the current block's hash
-                var hash = create_current_block_hash(i, response);
+                const hash = create_current_block_hash(i, response);
 
                 // Genesis block
                 if (i == 0) {
                     // Append genesis card with index and 'Genesis' title
-                    let block_index = $('<h4>', {text: "Block #" + response['chain'][i]['index']});
-                    let hr = $('<hr>');
-                    let genesis_tag = $('<h3>', {class: "text-center text-secondary", text: "Genesis"})
+                    const block_index = $('<h4>', {text: "Block #" + response['chain'][i]['index']});
+                    const hr = $('<hr>');
+                    const genesis_tag = $('<h3>', {class: "text-center text-secondary", text: "Genesis"})
                     card_text.append(block_index, hash, hr, genesis_tag);
 
                     // Assemble the block and add it to the row
-                    let block = assemble_block(card_text);
+                    const block = assemble_block(card_text);
 
                     row.append(block);
                     continue;
                 };
 
                 // Append card header with index, hash, and previous hash
-                let block_index = $('<h4>', {text: "Block #" + response['chain'][i]['index']});
-                let prev_hash = create_prev_block_hash(response);
-                let hr = $('<hr>');
+                const block_index = $('<h4>', {text: "Block #" + response['chain'][i]['index']});
+                const prev_hash = create_prev_block_hash(response);
+                const hr = $('<hr>');
                 card_text.append(block_index, hash, prev_hash, hr);
 
                 // Add the block's transactions
                 for (j = 0; j < response['chain'][i]['transactions'].length; j++){
-                    let recipient_str = response['chain'][i]['transactions'][j]['recipient'];
-                    let recipient_str_trim = str_trim(recipient_str, 6);
-                    let sender_str = response['chain'][i]['transactions'][j]['sender'];
-                    let sender_str_trim = str_trim(sender_str, 6);
+                    const recipient_str = response['chain'][i]['transactions'][j]['recipient'];
+                    const recipient_str_trim = str_trim(recipient_str, 6);
+                    const sender_str = response['chain'][i]['transactions'][j]['sender'];
+                    const sender_str_trim = str_trim(sender_str, 6);
 
-                    let transaction = create_transaction(response, recipient_str_trim, sender_str_trim);
+                    const transaction = create_transaction(response, recipient_str_trim, sender_str_trim);
 
                     // Append transaction to card
                     card_text.append(transaction);
                 };
 
                 // Format date and time, and append it to the card
-                var options = {year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit"};
-                var date = new Date(response["chain"][i]["timestamp"] * 1000);
-                var formattedDateTime = $('<div>', {class: "text-end text-muted", text: date.toLocaleTimeString("en-us", options)});
+                const options = {year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit"};
+                const date = new Date(response["chain"][i]["timestamp"] * 1000);
+                const formattedDateTime = $('<div>', {class: "text-end text-muted", text: date.toLocaleTimeString("en-us", options)});
                 card_text.append(formattedDateTime);
                 
 
                 // Assemble the block and add it to the row
-                let block = assemble_block(card_text);
+                const block = assemble_block(card_text);
                 row.append(block);
 
                 // Move down a row every four blocks
                 count += 1;
                 if (count % 4 == 0) {
-                    var br = $('<br><br>');
+                    const br = $('<br><br>');
                     $('#blockchain_visualizer').append(row, br);
                     row = $('<div>', {class: "row"});
                 };
@@ -123,28 +123,28 @@ $(document).ready(function(){
             // Reward transaction
             transaction = $('<div>', {class: "alert alert-warning", text: "   " + response['chain'][i]['transactions'][j]['amount'] + " to "});
 
-            let arrow = $('<span>', {class: "fa fa-angle-double-right"}); // Add right arrow
+            const arrow = $('<span>', {class: "fa fa-angle-double-right"}); // Add right arrow
             transaction.prepend(arrow);
             transaction.append(recipient_str);
         } else if (response['chain'][i]['transactions'][j]['recipient'] == 'blockchain'){
             // Transaction fee
             transaction = $('<div>', {class: "alert alert-danger", text: "   " + response['chain'][i]['transactions'][j]['amount'] + " from "});
 
-            let arrow = $('<span>', {class: "fa fa-angle-double-left"}); // Add left arrow
+            const arrow = $('<span>', {class: "fa fa-angle-double-left"}); // Add left arrow
             transaction.prepend(arrow);
             transaction.append(sender_str);
         } else {
             // Standard transaction
             transaction = $('<div>', {class: "alert alert-success"});
             
-            let recipient = $('<span>', {text: "   " + response['chain'][i]['transactions'][j]['amount'] + " to "});
+            const recipient = $('<span>', {text: "   " + response['chain'][i]['transactions'][j]['amount'] + " to "});
             recipient.append(recipient_str);
             let arrow = $('<span>', {class: "fa fa-angle-double-right"}); // Add right arrow
             transaction.append(arrow, recipient);
 
-            let br = $('<br><br>');
+            const br = $('<br><br>');
 
-            let sender = $('<span>', {text: "   " + response['chain'][i]['transactions'][j]['amount'] + " from "});
+            const sender = $('<span>', {text: "   " + response['chain'][i]['transactions'][j]['amount'] + " from "});
             sender.append(sender_str);
             arrow = $('<span>', {class: "fa fa-angle-double-left"}); // Add left arrow
             transaction.append(br, arrow, sender);
@@ -156,7 +156,7 @@ $(document).ready(function(){
     
     // Creates an element that contains the current block's hash
     function create_current_block_hash(i, response) {
-        let hash = $('<span>', {text: "Hash: "});
+        const hash = $('<span>', {text: "Hash: "});
 
         let hash_str;
         if (i != response['length']-1) {
@@ -165,7 +165,7 @@ $(document).ready(function(){
             hash_str = get_latest_block_hash(); // For the latest block, get the hash explicitly since there is no block in front of it
         };
 
-        let hash_str_trim = str_trim(hash_str, 5);
+        const hash_str_trim = str_trim(hash_str, 5);
         hash.append(hash_str_trim);
         return hash
     };
@@ -191,9 +191,9 @@ $(document).ready(function(){
 
     // Creates an element that contains the previous block's hash
     function create_prev_block_hash(response) {
-        let prev_hash = $('<p>', {text: "Previous Hash: "});
-        let prev_hash_str = response['chain'][i]['previous_hash'];
-        let prev_hash_str_trim = str_trim(prev_hash_str, 5);
+        const prev_hash = $('<p>', {text: "Previous Hash: "});
+        const prev_hash_str = response['chain'][i]['previous_hash'];
+        const prev_hash_str_trim = str_trim(prev_hash_str, 5);
         prev_hash.append(prev_hash_str_trim);
         return prev_hash
     };
@@ -201,16 +201,16 @@ $(document).ready(function(){
     
     // Trims a string and returns a strong element, leaving front and end of string
     function str_trim(string, n) {
-        let trimmed_string = string.substring(0, n) + "..." + string.substring(string.length - n, string.length);
+        const trimmed_string = string.substring(0, n) + "..." + string.substring(string.length - n, string.length);
         return $('<strong>', {text: trimmed_string})
     };
 
 
     // Assembles block, given card text
     function assemble_block(card_text) {
-        var block = $('<div>', {class: "col-lg-3"});
-        var card = $('<div>', {class: "card"})
-        var card_body = $('<div>', {class: "card-body"});
+        const block = $('<div>', {class: "col-lg-3"});
+        const card = $('<div>', {class: "card"})
+        const card_body = $('<div>', {class: "card-body"});
 
         card_body.append(card_text);
         card.append(card_body);
